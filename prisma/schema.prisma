@@ -13,10 +13,11 @@ model Teacher {
   surname     String
   email       String     @unique
   password    String
-  classes     Class[] // Классы, которыми управляет учитель
-  lessons     Lesson[] // Уроки, которые ведёт учитель
-  schedules   Schedule[] // Расписание, составленное учителем
+  classes     Class[] 
+  lessons     Lesson[] 
+  schedules   Schedule[] 
   accessToken String?
+  age         Int 
 }
 
 model Student {
@@ -25,30 +26,44 @@ model Student {
   surname     String
   email       String        @unique
   password    String
-  classId     Int? // ID класса, если ученик принят
+  classId     Int? 
   class       Class?        @relation(fields: [classId], references: [id])
-  grades      Grade[] // Оценки ученика
+  grades      Grade[] 
   JoinRequest JoinRequest[]
   accessToken String?
+  age         Int 
+  parentId    Int?
+  parent      Parent?       @relation(fields: [parentId], references: [id])
+}
+
+model Parent {
+  id          Int       @id @default(autoincrement())
+  name        String
+  surname     String
+  email       String    @unique
+  password    String
+  parentCode  String    @unique
+  students    Student[] 
+  age         Int 
 }
 
 model Class {
   id        Int           @id @default(autoincrement())
-  name      String // Название класса (например, "1IT")
-  code      String        @unique // Уникальный код для подключения
-  teacherId Int // Классный руководитель
+  name      String 
+  code      String        @unique 
+  teacherId Int 
   teacher   Teacher       @relation(fields: [teacherId], references: [id])
-  students  Student[] // Ученики в классе
-  requests  JoinRequest[] // Заявки на вступление в класс
+  students  Student[] 
+  requests  JoinRequest[] 
 }
 
 model JoinRequest {
   id        Int     @id @default(autoincrement())
-  studentId Int // Ученик, отправивший запрос
+  studentId Int 
   student   Student @relation(fields: [studentId], references: [id])
-  classId   Int // Класс, в который хотят вступить
+  classId   Int 
   class     Class   @relation(fields: [classId], references: [id])
-  status    Status  @default(PENDING) // "pending", "accepted", "rejected"
+  status    Status  @default(PENDING) 
 }
 
 enum Status {
@@ -59,33 +74,33 @@ enum Status {
 
 model Lesson {
   id        Int        @id @default(autoincrement())
-  title     String // Название урока (например, "Математика")
-  teacherId Int // Учитель, ведущий урок
+  title     String 
+  teacherId Int 
   teacher   Teacher    @relation(fields: [teacherId], references: [id])
-  schedules Schedule[] // Связь с расписанием
+  schedules Schedule[] 
   Grade     Grade[]
 }
 
 model Schedule {
   id        Int     @id @default(autoincrement())
-  dayOfWeek Int // День недели (1 = Понедельник, 7 = Воскресенье)
-  startTime String // Начало урока (HH:mm)
-  endTime   String // Конец урока (HH:mm)
-  isOddWeek Boolean // True - нечётная неделя, False - чётная неделя
-  lessonId  Int // Урок
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  isOddWeek Boolean
+  lessonId  Int
   lesson    Lesson  @relation(fields: [lessonId], references: [id])
-  teacherId Int // Учитель
+  teacherId Int
   teacher   Teacher @relation(fields: [teacherId], references: [id])
-  classroom String? // Кабинет (опционально)
+  classroom String?
 }
 
 model Grade {
   id        Int      @id @default(autoincrement())
-  studentId Int // Ученик, получивший оценку
+  studentId Int
   student   Student  @relation(fields: [studentId], references: [id])
-  lessonId  Int // Предмет, по которому поставлена оценка
+  lessonId  Int
   lesson    Lesson   @relation(fields: [lessonId], references: [id])
-  value     Int // Оценка (например, 1-5 или 0-100)
-  weight    Int // Важность оценки
-  date      DateTime @default(now()) // Дата выставления
+  value     Int
+  weight    Int
+  date      DateTime @default(now())
 }

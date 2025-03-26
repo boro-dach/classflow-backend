@@ -1,231 +1,128 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma.service';
-import * as argon2 from 'argon2';
-import { studentRegisterDto, studentLoginDto, teacherRegisterDto, teacherLoginDto } from './dto/auth.dto';
-
-const logger = new Logger();
+import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { StudentService } from 'src/student/student.service';
+import { TeacherService } from 'src/teacher/teacher.service';
+import { ParentService } from 'src/parent/parent.service';
 
 export interface TokenPayload {
-  id: number;
   email: string;
-  role: 'student' | 'teacher';
 }
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
+    private jwt: JwtService,
+    private student: StudentService,
+    private teacher: TeacherService,
+    private parent: ParentService,
   ) {}
 
-  // Генерация JWT токена
-  public async generateToken(payload: TokenPayload): Promise<string> {
-    return this.jwtService.sign(payload);
-  }
+  //universal functions
 
-  // Регистрация студента
-  public async registerStudent(dto: studentRegisterDto) {
-    // Хеширование пароля
-    const hashedPassword = await argon2.hash(dto.password);
-
-    // Создание нового студента в базе данных
-    const student = await this.prisma.student.create({
-      data: {
-        email: dto.email,
-        password: hashedPassword,
-        name: dto.name,
-        surname: dto.surname,
+  issueToken(email: string) {
+    const token = this.jwt.sign(
+      { email },
+      {
+        expiresIn: '7d',
       },
-    });
+    );
 
-    logger.log('при геристрации создан ученик ', student)
-
-    // Генерация токена для студента
-    const token = await this.generateToken({
-      id: student.id,
-      email: student.email,
-      role: 'student',
-    });
-
-    logger.log('ученику сгенерирован токен ', token)
-
-    // Обновление данных студента с добавлением токена
-    await this.prisma.student.update({
-      where: { id: student.id },
-      data: { accessToken: token },
-    });
-
-    // Возвращаем результат с данными студента и токеном
-
-    return {
-      id: student.id,
-      name: student.name,
-      surname: student.surname,
-      email: student.email,
-      token
-    };
+    return token;
   }
 
-  // Логин студента
-  public async loginStudent(dto: studentLoginDto) {
-    const student = await this.prisma.student.findUnique({
-      where: { email: dto.email },
-    });
+  //student functions
 
-    // Проверка, существует ли студент
-    if (!student) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+  async registerStudent(dto: RegisterDto) {
+    const oldStudent = await this.student.getByEmail(dto.email);
 
-    // Проверка пароля
-    const isPasswordValid = await argon2.verify(student.password, dto.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    if (oldStudent) throw new BadRequestException('User already exists');
 
-    // Генерация нового токена для студента
-    const token = await this.generateToken({
-      id: student.id,
-      email: student.email,
-      role: 'student',
-    });
+    const token = this.issueToken(dto.email);
 
-    // Обновление токена в базе данных
-    await this.prisma.student.update({
-      where: { id: student.id },
-      data: { accessToken: token },
-    });
+    const student = await this.student.create(dto, token);
 
-    // Возвращаем результат с данными студента и токеном
-    return {
-      id: student.id,
-      name: student.name,
-      surname: student.surname,
-      email: student.email,
-      token
-    };
+    return { student, token };
   }
 
-    // Регистрация учителя
-    public async registerTeacher(dto: teacherRegisterDto) {
-      // Хеширование пароля
-      const hashedPassword = await argon2.hash(dto.password);
-  
-      // Создание нового студента в базе данных
-      const teacher = await this.prisma.teacher.create({
-        data: {
-          email: dto.email,
-          password: hashedPassword,
-          name: dto.name,
-          surname: dto.surname,
-        },
-      });
-  
-      logger.log('при геристрации создан учитель ', teacher)
-  
-      // Генерация токена для учителя
-      const token = await this.generateToken({
-        id: teacher.id,
-        email: teacher.email,
-        role: 'teacher',
-      });
-  
-      logger.log('учителю сгенерирован токен ', token)
-  
-      // Обновление данных студента с добавлением токена
-      await this.prisma.teacher.update({
-        where: { id: teacher.id },
-        data: { accessToken: token },
-      });
-  
-      // Возвращаем результат с данными студента и токеном
-  
-      return {
-        id: teacher.id,
-        name: teacher.name,
-        surname: teacher.surname,
-        email: teacher.email,
-        token
-      };
-    }
-  
-    // Логин учителя
-    public async loginTeacher(dto: teacherLoginDto) {
-      const teacher = await this.prisma.teacher.findUnique({
-        where: { email: dto.email },
-      });
-  
-      // Проверка, существует ли студент
-      if (!teacher) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
-  
-      // Проверка пароля
-      const isPasswordValid = await argon2.verify(teacher.password, dto.password);
-      if (!isPasswordValid) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
-  
-      // Генерация нового токена для студента
-      const token = await this.generateToken({
-        id: teacher.id,
-        email: teacher.email,
-        role: 'teacher',
-      });
-  
-      // Обновление токена в базе данных
-      await this.prisma.teacher.update({
-        where: { id: teacher.id },
-        data: { accessToken: token },
-      });
-  
-      // Возвращаем результат с данными студента и токеном
-      return {
-        id: teacher.id,
-        name: teacher.name,
-        surname: teacher.surname,
-        email: teacher.email,
-        token
-      };
-    }
+  async loginStudent(dto: LoginDto) {
+    const student = await this.validateStudent(dto);
 
-  // Валидация токена
-  public async validateToken(token: string): Promise<boolean> {
-    try {
-      const payload = await this.jwtService.verify(token);
+    const token = this.issueToken(dto.email);
 
-      // Проверка роли пользователя и токена
-      if (payload.role === 'student') {
-        const student = await this.prisma.student.findUnique({
-          where: { id: payload.id },
-        });
-        return student?.accessToken === token;
-      } else if (payload.role === 'teacher') {
-        const teacher = await this.prisma.teacher.findUnique({
-          where: { id: payload.id },
-        });
-        return teacher?.accessToken === token;
-      }
-
-      return false;
-    } catch {
-      return false;
-    }
+    return { student, token };
   }
 
-  // Валидация запроса с проверкой токена
-  public async validateRequest(token: string): Promise<TokenPayload> {
-    if (!token) {
-      throw new UnauthorizedException();
-    }
+  private async validateStudent(dto: LoginDto) {
+    const student = await this.student.getByEmail(dto.email);
 
-    const isValid = await this.validateToken(token);
+    if (!student) throw new NotFoundException('User not found');
 
-    if (!isValid) {
-      throw new UnauthorizedException();
-    }
+    return student;
+  }
 
-    return this.jwtService.decode(token) as TokenPayload;
+  //teacher functions
+
+  async registerTeacher(dto: RegisterDto) {
+    const oldTeacher = await this.teacher.getByEmail(dto.email);
+
+    if (oldTeacher) throw new BadRequestException('User already exists');
+
+    const token = this.issueToken(dto.email);
+
+    const teacher = await this.teacher.create(dto, token);
+
+    return { teacher, token };
+  }
+
+  async loginTeacher(dto: LoginDto) {
+    const teacher = await this.validateTeacher(dto);
+
+    const token = this.issueToken(dto.email);
+
+    return { teacher, token };
+  }
+
+  private async validateTeacher(dto: LoginDto) {
+    const teacher = await this.teacher.getByEmail(dto.email);
+
+    if (!teacher) throw new NotFoundException('User not found');
+
+    return teacher;
+  }
+
+  //parent functions
+
+  async registerParent(dto: RegisterDto) {
+    const oldTeacher = await this.parent.getByEmail(dto.email);
+
+    if (oldTeacher) throw new BadRequestException('User already exists');
+
+    const token = this.issueToken(dto.email);
+
+    const parent = await this.parent.create(dto, token);
+
+    return { parent, token };
+  }
+
+  async loginParent(dto: LoginDto) {
+    const parent = await this.validateParent(dto);
+
+    const token = this.issueToken(dto.email);
+
+    return { parent, token };
+  }
+
+  private async validateParent(dto: LoginDto) {
+    const parent = await this.parent.getByEmail(dto.email);
+
+    if (!parent) throw new NotFoundException('User not found');
+
+    return parent;
   }
 }

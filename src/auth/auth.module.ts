@@ -1,12 +1,16 @@
-// auth.module.ts
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { PrismaService } from 'src/prisma.service';
 import { AuthController } from './auth.controller';
+import { StudentService } from 'src/student/student.service';
+import { TeacherService } from 'src/teacher/teacher.service';
+import { ParentService } from 'src/parent/parent.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
@@ -14,7 +18,13 @@ import { AuthController } from './auth.controller';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService],
+  providers: [
+    AuthService,
+    PrismaService,
+    StudentService,
+    TeacherService,
+    ParentService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
