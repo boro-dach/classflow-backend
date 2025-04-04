@@ -5,9 +5,10 @@ import { StudentModule } from './student/student.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { ParentModule } from './parent/parent.module';
 import { SchoolModule } from './school/school.module';
+import { ClassModule } from './class/class.module';
 
 @Module({
-  imports: [AuthModule, StudentModule, TeacherModule, ParentModule, SchoolModule],
+  imports: [AuthModule, StudentModule, TeacherModule, ParentModule, SchoolModule, ClassModule],
   providers: [AppService],
 })
 export class AppModule {}
