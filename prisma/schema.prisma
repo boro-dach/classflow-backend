@@ -8,62 +8,80 @@ datasource db {
 }
 
 model Teacher {
-  id          Int        @id @default(autoincrement())
-  name        String
-  surname     String
-  email       String     @unique
-  password    String
-  classes     Class[] 
-  lessons     Lesson[] 
-  schedules   Schedule[] 
-  accessToken String?
-  age         Int 
+  id             Int       @id @default(autoincrement())
+  name           String
+  surname        String
+  email          String    @unique
+  password       String
+  classes        Class[]
+  lessons        Lesson[]
+  schedules      Schedule[]
+  accessToken    String?
+  age            Int
+  schoolId       Int?
+  school         School?   @relation("TeachersToSchool", fields: [schoolId], references: [id])
+  principalAt    School?   @relation("PrincipalToSchool")
 }
 
 model Student {
-  id          Int           @id @default(autoincrement())
-  name        String
-  surname     String
-  email       String        @unique
-  password    String
-  classId     Int? 
-  class       Class?        @relation(fields: [classId], references: [id])
-  grades      Grade[] 
-  JoinRequest JoinRequest[]
-  accessToken String?
-  age         Int 
-  parentId    Int?
-  parent      Parent?       @relation(fields: [parentId], references: [id])
+  id           Int           @id @default(autoincrement())
+  name         String
+  surname      String
+  email        String        @unique
+  password     String
+  classId      Int?
+  class        Class?        @relation(fields: [classId], references: [id])
+  grades       Grade[]
+  joinRequests JoinRequest[]
+  accessToken  String?
+  age          Int
+  parentId     Int?
+  parent       Parent?       @relation(fields: [parentId], references: [id])
+  schoolId     Int?
+  school       School?       @relation(fields: [schoolId], references: [id])
 }
 
 model Parent {
-  id          Int       @id @default(autoincrement())
-  name        String
-  surname     String
-  email       String    @unique
-  password    String
-  parentCode  String    @unique
-  students    Student[] 
-  age         Int 
+  id         Int       @id @default(autoincrement())
+  name       String
+  surname    String
+  email      String    @unique
+  password   String
+  parentCode String    @unique
+  students   Student[]
+  age        Int
 }
 
 model Class {
-  id        Int           @id @default(autoincrement())
-  name      String 
-  code      String        @unique 
-  teacherId Int 
-  teacher   Teacher       @relation(fields: [teacherId], references: [id])
-  students  Student[] 
-  requests  JoinRequest[] 
+  id           Int           @id @default(autoincrement())
+  name         String
+  code         String        @unique
+  teacherId    Int
+  teacher      Teacher       @relation(fields: [teacherId], references: [id])
+  students     Student[]
+  joinRequests JoinRequest[]
+  schoolId     Int?
+  school       School?       @relation(fields: [schoolId], references: [id])
+}
+
+model School {
+  id          Int       @id @default(autoincrement())
+  name        String
+  address     String
+  principalId Int       @unique
+  principal   Teacher   @relation("PrincipalToSchool", fields: [principalId], references: [id])
+  classes     Class[]
+  teachers    Teacher[] @relation("TeachersToSchool")
+  students    Student[]
 }
 
 model JoinRequest {
   id        Int     @id @default(autoincrement())
-  studentId Int 
+  studentId Int
   student   Student @relation(fields: [studentId], references: [id])
-  classId   Int 
+  classId   Int
   class     Class   @relation(fields: [classId], references: [id])
-  status    Status  @default(PENDING) 
+  status    Status  @default(PENDING)
 }
 
 enum Status {
@@ -74,11 +92,11 @@ enum Status {
 
 model Lesson {
   id        Int        @id @default(autoincrement())
-  title     String 
-  teacherId Int 
+  title     String
+  teacherId Int
   teacher   Teacher    @relation(fields: [teacherId], references: [id])
-  schedules Schedule[] 
-  Grade     Grade[]
+  schedules Schedule[]
+  grades    Grade[]
 }
 
 model Schedule {
