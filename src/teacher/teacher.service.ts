@@ -25,4 +25,13 @@ export class TeacherService {
       },
     });
   }
+
+  async addSchool(schoolId: number, teacherId: number) {
+    return this.prisma.teacher.update({
+      where: { id: teacherId },
+      data: {
+        schoolId,
+      },
+    });
+  }
 }
