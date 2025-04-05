@@ -8,6 +8,9 @@ datasource db {
 }
 
 model Teacher {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
   id             Int       @id @default(autoincrement())
   name           String
   surname        String
@@ -24,6 +27,9 @@ model Teacher {
 }
 
 model Student {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
   id           Int           @id @default(autoincrement())
   name         String
   surname      String
@@ -42,6 +48,9 @@ model Student {
 }
 
 model Parent {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
   id         Int       @id @default(autoincrement())
   name       String
   surname    String
@@ -53,6 +62,9 @@ model Parent {
 }
 
 model Class {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
   id           Int           @id @default(autoincrement())
   name         String
   code         String        @unique
@@ -65,6 +77,9 @@ model Class {
 }
 
 model School {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
   id          Int       @id @default(autoincrement())
   name        String
   address     String
@@ -76,6 +91,9 @@ model School {
 }
 
 model JoinRequest {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
   id        Int     @id @default(autoincrement())
   studentId Int
   student   Student @relation(fields: [studentId], references: [id])
@@ -91,6 +109,9 @@ enum Status {
 }
 
 model Lesson {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
   id        Int        @id @default(autoincrement())
   title     String
   teacherId Int
@@ -100,6 +121,9 @@ model Lesson {
 }
 
 model Schedule {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
   id        Int     @id @default(autoincrement())
   dayOfWeek Int
   startTime String
@@ -113,6 +137,9 @@ model Schedule {
 }
 
 model Grade {
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
   id        Int      @id @default(autoincrement())
   studentId Int
   student   Student  @relation(fields: [studentId], references: [id])
@@ -121,4 +148,4 @@ model Grade {
   value     Int
   weight    Int
   date      DateTime @default(now())
-}
+} 
