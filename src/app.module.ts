@@ -6,9 +6,10 @@ import { TeacherModule } from './teacher/teacher.module';
 import { ParentModule } from './parent/parent.module';
 import { SchoolModule } from './school/school.module';
 import { ClassModule } from './class/class.module';
+import { JoinRequestModule } from './join-request/join-request.module';
 
 @Module({
-  imports: [AuthModule, StudentModule, TeacherModule, ParentModule, SchoolModule, ClassModule],
+  imports: [AuthModule, StudentModule, TeacherModule, ParentModule, SchoolModule, ClassModule, JoinRequestModule],
   providers: [AppService],
 })
 export class AppModule {}
