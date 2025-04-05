@@ -47,7 +47,7 @@ export class AuthService {
 
     const student = await this.student.create(dto, token);
 
-    return { student, token };
+    return student;
   }
 
   async loginStudent(dto: LoginDto) {
@@ -77,7 +77,7 @@ export class AuthService {
 
     const teacher = await this.teacher.create(dto, token);
 
-    return { teacher, token };
+    return teacher;
   }
 
   async loginTeacher(dto: LoginDto) {
@@ -99,15 +99,15 @@ export class AuthService {
   //parent functions
 
   async registerParent(dto: RegisterDto) {
-    const oldTeacher = await this.parent.getByEmail(dto.email);
+    const oldParent = await this.parent.getByEmail(dto.email);
 
-    if (oldTeacher) throw new BadRequestException('User already exists');
+    if (oldParent) throw new BadRequestException('User already exists');
 
     const token = this.issueToken(dto.email);
 
     const parent = await this.parent.create(dto, token);
 
-    return { parent, token };
+    return parent;
   }
 
   async loginParent(dto: LoginDto) {
