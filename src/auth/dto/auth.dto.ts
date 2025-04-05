@@ -1,30 +1,28 @@
 import { IsEmail, IsNumber, IsString, Min, MinLength } from 'class-validator';
 
 export class RegisterDto {
-  @IsString()
+  @IsString({ message: 'Name is not valid' })
   name: string;
 
-  @IsString()
+  @IsString({ message: 'Surname is not valid' })
   surname: string;
 
-  @IsString()
-  @IsEmail()
+  @IsEmail({}, { message: 'Email is not valid' })
   email: string;
 
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'Password is not valid' })
+  @MinLength(6, { message: 'Password has to be at least 6 characters long' })
   password: string;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'Age has to be a number' })
   age: number;
 }
 
 export class LoginDto {
-  @IsString()
-  @IsEmail()
+  @IsEmail({}, { message: 'Email is not valid' })
   email: string;
 
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'Password is not valid' })
+  @MinLength(6, { message: 'Password has to be at least 6 characters long' })
   password: string;
 }
