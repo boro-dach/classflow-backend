@@ -35,7 +35,7 @@ model Student {
   surname      String
   email        String        @unique
   password     String
-  classId      Int?
+  classId      String?
   class        Class?        @relation(fields: [classId], references: [id])
   grades       Grade[]
   joinRequests JoinRequest[]
@@ -65,9 +65,8 @@ model Class {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
   
-  id           Int           @id @default(autoincrement())
+  id           String        @id @default(cuid())
   name         String
-  code         String        @unique
   teacherId    Int
   teacher      Teacher       @relation(fields: [teacherId], references: [id])
   students     Student[]
@@ -97,7 +96,7 @@ model JoinRequest {
   id        Int     @id @default(autoincrement())
   studentId Int
   student   Student @relation(fields: [studentId], references: [id])
-  classId   Int
+  classId   String
   class     Class   @relation(fields: [classId], references: [id])
   status    Status  @default(PENDING)
 }
