@@ -38,7 +38,7 @@ export class AuthService {
 
   //student functions
 
-  async registerStudent(dto: RegisterDto, parentId: number) {
+  async registerStudent(dto: RegisterDto, parentCode: string) {
     const oldStudent = await this.student.getByEmail(dto.email);
 
     if (oldStudent) throw new BadRequestException('User already exists');
@@ -46,9 +46,9 @@ export class AuthService {
     const token = this.issueToken(dto.email);
 
     if (dto.age < 18) {
-      if (!parentId) throw new BadRequestException('Parent ID is required');
+      if (!parentCode) throw new BadRequestException('Parent code is required');
 
-      const student = await this.student.createMinor(dto, token, parentId);
+      const student = await this.student.createMinor(dto, token, parentCode);
 
       return student;
     } else {
