@@ -16,11 +16,11 @@ model Teacher {
   surname        String
   email          String    @unique
   password       String
+  age            Int
+  accessToken    String?
+
   classes        Class[]
   lessons        Lesson[]
-  schedules      Schedule[]
-  accessToken    String?
-  age            Int
   schoolId       Int?
   school         School?   @relation("TeachersToSchool", fields: [schoolId], references: [id])
   principalAt    School?   @relation("PrincipalToSchool")
@@ -29,18 +29,19 @@ model Teacher {
 model Student {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  
+
   id           Int           @id @default(autoincrement())
   name         String
   surname      String
   email        String        @unique
   password     String
+  age          Int
+  accessToken  String?
+
   classId      String?
   class        Class?        @relation(fields: [classId], references: [id])
   grades       Grade[]
   joinRequests JoinRequest[]
-  accessToken  String?
-  age          Int
   parentId     Int?
   parent       Parent?       @relation(fields: [parentId], references: [id])
   schoolId     Int?
@@ -50,39 +51,43 @@ model Student {
 model Parent {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  
+
   id         Int       @id @default(autoincrement())
   name       String
   surname    String
   email      String    @unique
   password   String
   parentCode String    @unique
-  students   Student[]
   age        Int
   accessToken String?
+
+  students   Student[]
 }
 
 model Class {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  
+
   id           String        @id @default(cuid())
   name         String
+
   teacherId    Int
   teacher      Teacher       @relation(fields: [teacherId], references: [id])
   students     Student[]
   joinRequests JoinRequest[]
-  schoolId     Int?
-  school       School?       @relation(fields: [schoolId], references: [id])
+  schoolId     Int
+  school       School        @relation(fields: [schoolId], references: [id])
+  lessons      Lesson[]
 }
 
 model School {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  
+
   id          Int       @id @default(autoincrement())
   name        String
   address     String
+
   principalId Int       @unique
   principal   Teacher   @relation("PrincipalToSchool", fields: [principalId], references: [id])
   classes     Class[]
@@ -93,15 +98,15 @@ model School {
 model JoinRequest {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  
+
   id        String     @id @default(cuid())
+  status    Status     @default(PENDING)
+  code      String     @unique
+
   studentId Int
   student   Student @relation(fields: [studentId], references: [id])
   classId   String
   class     Class   @relation(fields: [classId], references: [id])
-  status    Status  @default(PENDING)
-
-  code     String @unique
 }
 
 enum Status {
@@ -113,41 +118,47 @@ enum Status {
 model Lesson {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  
+
   id        Int        @id @default(autoincrement())
-  title     String
+  subject   String
+  week      Week
+  day       Day
+
   teacherId Int
   teacher   Teacher    @relation(fields: [teacherId], references: [id])
-  schedules Schedule[]
+  classId   String
+  class     Class      @relation(fields: [classId], references: [id])
   grades    Grade[]
+
+  @@unique([teacherId, classId, week, day, subject])
 }
 
-model Schedule {
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-  
-  id        Int     @id @default(autoincrement())
-  dayOfWeek Int
-  startTime String
-  endTime   String
-  isOddWeek Boolean
-  lessonId  Int
-  lesson    Lesson  @relation(fields: [lessonId], references: [id])
-  teacherId Int
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
-  classroom String?
+enum Week {
+  ODD
+  EVEN
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
 
 model Grade {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  
+
   id        Int      @id @default(autoincrement())
+  value     String
+  weight    Int
+  date      DateTime @default(now())
+
   studentId Int
   student   Student  @relation(fields: [studentId], references: [id])
   lessonId  Int
   lesson    Lesson   @relation(fields: [lessonId], references: [id])
-  value     Int
-  weight    Int
-  date      DateTime @default(now())
-} 
+}

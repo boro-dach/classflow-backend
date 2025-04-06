@@ -7,9 +7,10 @@ import { ParentModule } from './parent/parent.module';
 import { SchoolModule } from './school/school.module';
 import { ClassModule } from './class/class.module';
 import { JoinRequestModule } from './join-request/join-request.module';
+import { LessonModule } from './lesson/lesson.module';
 
 @Module({
-  imports: [AuthModule, StudentModule, TeacherModule, ParentModule, SchoolModule, ClassModule, JoinRequestModule],
+  imports: [AuthModule, StudentModule, TeacherModule, ParentModule, SchoolModule, ClassModule, JoinRequestModule, LessonModule],
   providers: [AppService],
 })
 export class AppModule {}

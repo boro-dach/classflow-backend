@@ -7,6 +7,6 @@ export class CreateClassDto {
   @IsInt()
   teacherId: number;
 
-  @IsString()
-  scoolId: string;
+  @IsInt()
+  schoolId: number;
 }
