@@ -26,7 +26,13 @@ export class StudentService {
     });
   }
 
-  async createMinor(dto: RegisterDto, token: string, parentId: number) {
+  async createMinor(dto: RegisterDto, token: string, parentCode: string) {
+    const parent = await this.prisma.parent.findFirst({
+      where: { parentCode },
+    });
+
+    if (!parent) throw new Error('Parent code is invalid');
+
     return this.prisma.student.create({
       data: {
         name: dto.name,
@@ -35,7 +41,7 @@ export class StudentService {
         password: await hash(dto.password),
         age: dto.age,
         accessToken: token,
-        parentId: parentId,
+        parentId: parent.id,
       },
     });
   }
