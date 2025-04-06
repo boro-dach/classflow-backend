@@ -8,8 +8,8 @@ export class AuthController {
 
   @HttpCode(200)
   @Post('register-student')
-  async registerStudent(@Body() dto: RegisterDto, parentCode?: string) {
-    const student = await this.authService.registerStudent(dto, parentCode);
+  async registerStudent(@Body() dto: RegisterDto) {
+    const student = await this.authService.registerStudent(dto);
 
     return student;
   }

@@ -1,4 +1,11 @@
-import { IsEmail, IsNumber, IsString, Min, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 export class RegisterDto {
   @IsString({ message: 'Name is not valid' })
@@ -16,6 +23,10 @@ export class RegisterDto {
 
   @IsNumber({}, { message: 'Age has to be a number' })
   age: number;
+
+  @IsOptional()
+  @IsString({ message: 'Parent code is not valid' })
+  parentCode?: string;
 }
 
 export class LoginDto {
