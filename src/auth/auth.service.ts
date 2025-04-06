@@ -38,16 +38,24 @@ export class AuthService {
 
   //student functions
 
-  async registerStudent(dto: RegisterDto) {
+  async registerStudent(dto: RegisterDto, parentId: number) {
     const oldStudent = await this.student.getByEmail(dto.email);
 
     if (oldStudent) throw new BadRequestException('User already exists');
 
     const token = this.issueToken(dto.email);
 
-    const student = await this.student.create(dto, token);
+    if (dto.age < 18) {
+      if (!parentId) throw new BadRequestException('Parent ID is required');
 
-    return student;
+      const student = await this.student.createMinor(dto, token, parentId);
+
+      return student;
+    } else {
+      const student = await this.student.createAdult(dto, token);
+
+      return student;
+    }
   }
 
   async loginStudent(dto: LoginDto) {
@@ -74,6 +82,9 @@ export class AuthService {
     if (oldTeacher) throw new BadRequestException('User already exists');
 
     const token = this.issueToken(dto.email);
+
+    if (dto.age < 18)
+      throw new BadRequestException('You must be at least 18 years old');
 
     const teacher = await this.teacher.create(dto, token);
 
@@ -104,6 +115,9 @@ export class AuthService {
     if (oldParent) throw new BadRequestException('User already exists');
 
     const token = this.issueToken(dto.email);
+
+    if (dto.age < 18)
+      throw new BadRequestException('You must be at least 18 years old');
 
     const parent = await this.parent.create(dto, token);
 

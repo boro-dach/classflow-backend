@@ -59,6 +59,7 @@ model Parent {
   parentCode String    @unique
   students   Student[]
   age        Int
+  accessToken String?
 }
 
 model Class {
