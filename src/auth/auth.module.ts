@@ -7,6 +7,7 @@ import { StudentService } from 'src/student/student.service';
 import { TeacherService } from 'src/teacher/teacher.service';
 import { ParentService } from 'src/parent/parent.service';
 import { ConfigModule } from '@nestjs/config';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConfigModule } from '@nestjs/config';
     StudentService,
     TeacherService,
     ParentService,
+    JwtStrategy,
   ],
   exports: [AuthService],
 })
