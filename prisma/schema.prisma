@@ -123,6 +123,11 @@ model Lesson {
   subject   String
   week      Week
   day       Day
+  cabinet String
+  order    Int
+  startTime String
+  endTime String
+  theme String?
 
   teacherId Int
   teacher   Teacher    @relation(fields: [teacherId], references: [id])

@@ -1,4 +1,5 @@
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsString } from 'class-validator';
+import { IsTimeString } from './decorators/is-time-string.decorator';
 
 enum Week {
   ODD = 'ODD',
@@ -27,9 +28,24 @@ export class CreateLessonDto {
   @IsEnum(Day, { message: 'Day is not valid' })
   day: Day;
 
-  @IsNumber()
+  @IsInt()
   teacherId: number;
 
   @IsString()
   classId: string;
+
+  @IsString()
+  cabinet: string;
+
+  @IsInt()
+  order: number;
+
+  @IsTimeString()
+  startTime: string;
+
+  @IsTimeString()
+  endTime: string;
+
+  @IsString()
+  theme: string;
 }
