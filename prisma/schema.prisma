@@ -160,7 +160,7 @@ model Grade {
   id        Int      @id @default(autoincrement())
   value     String
   weight    Int
-  date      DateTime @default(now())
+  date      String
 
   studentId Int
   student   Student  @relation(fields: [studentId], references: [id])
