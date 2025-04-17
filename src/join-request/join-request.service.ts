@@ -17,7 +17,7 @@ export class JoinRequestService {
         code += characters[randomIndex];
       }
 
-      const exists = await this.prisma.parent.findUnique({
+      const exists = await this.prisma.user.findUnique({
         where: { parentCode: code },
       });
 

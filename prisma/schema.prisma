@@ -7,61 +7,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Teacher {
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  id             Int       @id @default(autoincrement())
+model User {
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  id             Int          @id @default(autoincrement())
   name           String
   surname        String
-  email          String    @unique
+  email          String       @unique
+  login          String       @unique
   password       String
   age            Int
+  role           UserRole
   accessToken    String?
-
-  classes        Class[]
-  lessons        Lesson[]
-  schoolId       Int?
-  school         School?   @relation("TeachersToSchool", fields: [schoolId], references: [id])
-  principalAt    School?   @relation("PrincipalToSchool")
+  
+  // Fields specific to Teachers
+  teacherClasses Class[]      @relation("TeacherToClass")
+  lessons        Lesson[]     @relation("TeacherToLesson")
+  teachingSchoolId Int?
+  teachingSchool School?      @relation("TeachersToSchool", fields: [teachingSchoolId], references: [id])
+  principalAt    School?      @relation("PrincipalToSchool")
+  
+  // Fields specific to Students
+  classId        String?
+  class          Class?       @relation("StudentToClass", fields: [classId], references: [id])
+  grades         Grade[]      @relation("StudentToGrade")
+  joinRequests   JoinRequest[] @relation("StudentToJoinRequest")
+  parentId       Int?
+  parent         User?        @relation("ParentToChildren", fields: [parentId], references: [id])
+  attendingSchoolId Int?
+  attendingSchool School?     @relation("StudentsToSchool", fields: [attendingSchoolId], references: [id])
+  
+  // Fields specific to Parents
+  parentCode     String?      @unique
+  children       User[]       @relation("ParentToChildren")
 }
 
-model Student {
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  id           Int           @id @default(autoincrement())
-  name         String
-  surname      String
-  email        String        @unique
-  password     String
-  age          Int
-  accessToken  String?
-
-  classId      String?
-  class        Class?        @relation(fields: [classId], references: [id])
-  grades       Grade[]
-  joinRequests JoinRequest[]
-  parentId     Int?
-  parent       Parent?       @relation(fields: [parentId], references: [id])
-  schoolId     Int?
-  school       School?       @relation(fields: [schoolId], references: [id])
-}
-
-model Parent {
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  id         Int       @id @default(autoincrement())
-  name       String
-  surname    String
-  email      String    @unique
-  password   String
-  parentCode String    @unique
-  age        Int
-  accessToken String?
-
-  students   Student[]
+enum UserRole {
+  TEACHER
+  STUDENT
+  PARENT
 }
 
 model Class {
@@ -72,8 +56,8 @@ model Class {
   name         String
 
   teacherId    Int
-  teacher      Teacher       @relation(fields: [teacherId], references: [id])
-  students     Student[]
+  teacher      User          @relation("TeacherToClass", fields: [teacherId], references: [id])
+  students     User[]        @relation("StudentToClass")
   joinRequests JoinRequest[]
   schoolId     Int
   school       School        @relation(fields: [schoolId], references: [id])
@@ -89,10 +73,10 @@ model School {
   address     String
 
   principalId Int       @unique
-  principal   Teacher   @relation("PrincipalToSchool", fields: [principalId], references: [id])
+  principal   User      @relation("PrincipalToSchool", fields: [principalId], references: [id])
   classes     Class[]
-  teachers    Teacher[] @relation("TeachersToSchool")
-  students    Student[]
+  teachers    User[]    @relation("TeachersToSchool")
+  students    User[]    @relation("StudentsToSchool")
 }
 
 model JoinRequest {
@@ -104,9 +88,9 @@ model JoinRequest {
   code      String     @unique
 
   studentId Int
-  student   Student @relation(fields: [studentId], references: [id])
+  student   User       @relation("StudentToJoinRequest", fields: [studentId], references: [id])
   classId   String
-  class     Class   @relation(fields: [classId], references: [id])
+  class     Class      @relation(fields: [classId], references: [id])
 }
 
 enum Status {
@@ -123,14 +107,14 @@ model Lesson {
   subject   String
   week      Week
   day       Day
-  cabinet String
-  order    Int
+  cabinet   String
+  order     Int
   startTime String
-  endTime String
-  theme String?
+  endTime   String
+  theme     String?
 
   teacherId Int
-  teacher   Teacher    @relation(fields: [teacherId], references: [id])
+  teacher   User       @relation("TeacherToLesson", fields: [teacherId], references: [id])
   classId   String
   class     Class      @relation(fields: [classId], references: [id])
   grades    Grade[]
@@ -163,7 +147,7 @@ model Grade {
   date      String
 
   studentId Int
-  student   Student  @relation(fields: [studentId], references: [id])
+  student   User     @relation("StudentToGrade", fields: [studentId], references: [id])
   lessonId  Int
   lesson    Lesson   @relation(fields: [lessonId], references: [id])
 }

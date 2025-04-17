@@ -7,50 +7,18 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(200)
-  @Post('register-student')
+  @Post('register')
   async registerStudent(@Body() dto: RegisterDto) {
-    const student = await this.authService.registerStudent(dto);
+    const user = await this.authService.register(dto);
 
-    return student;
+    return user;
   }
 
   @HttpCode(200)
-  @Post('register-teacher')
-  async registerTeacher(@Body() dto: RegisterDto) {
-    const teacher = await this.authService.registerTeacher(dto);
-
-    return teacher;
-  }
-
-  @HttpCode(200)
-  @Post('register-parent')
-  async registerParent(@Body() dto: RegisterDto) {
-    const parent = await this.authService.registerParent(dto);
-
-    return parent;
-  }
-
-  @HttpCode(200)
-  @Post('login-student')
+  @Post('login')
   async loginStudent(@Body() dto: LoginDto) {
-    const student = await this.authService.loginStudent(dto);
+    const user = await this.authService.login(dto);
 
-    return student;
-  }
-
-  @HttpCode(200)
-  @Post('login-teacher')
-  async loginTeacher(@Body() dto: LoginDto) {
-    const teacher = await this.authService.loginTeacher(dto);
-
-    return teacher;
-  }
-
-  @HttpCode(200)
-  @Post('login-parent')
-  async loginParent(@Body() dto: LoginDto) {
-    const parent = await this.authService.loginParent(dto);
-
-    return parent;
+    return user;
   }
 }
