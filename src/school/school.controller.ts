@@ -12,7 +12,6 @@ export class SchoolController {
     private readonly user: UserService,
   ) {}
 
-  @Auth(UserRole.TEACHER)
   @HttpCode(200)
   @Post('create')
   async create(@Body() dto: CreateSchoolDto) {

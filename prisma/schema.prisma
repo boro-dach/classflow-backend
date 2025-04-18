@@ -119,7 +119,7 @@ model Lesson {
   class     Class      @relation(fields: [classId], references: [id])
   grades    Grade[]
 
-  @@unique([teacherId, classId, week, day, subject])
+  @@unique([teacherId, classId, day, subject])
 }
 
 enum Week {
@@ -145,6 +145,7 @@ model Grade {
   value     String
   weight    Int
   date      String
+  theme     String?
 
   studentId Int
   student   User     @relation("StudentToGrade", fields: [studentId], references: [id])

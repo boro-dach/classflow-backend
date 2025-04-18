@@ -13,4 +13,12 @@ export class GradeController {
 
     return grade;
   }
+
+  @HttpCode(200)
+  @Post('create-inherit')
+  async createInherit(@Body() dto: CreateGradeDto) {
+    const grade = await this.gradeService.createInherit(dto);
+
+    return grade;
+  }
 }

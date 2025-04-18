@@ -7,7 +7,6 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
-  @Auth()
   @HttpCode(200)
   @Post('create')
   async createClass(@Body() dto: CreateClassDto) {

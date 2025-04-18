@@ -1,4 +1,4 @@
-import { IsDate, IsInt, IsISO8601, IsString } from 'class-validator';
+import { IsInt, IsISO8601, IsOptional, IsString } from 'class-validator';
 
 export class CreateGradeDto {
   @IsString()
@@ -15,4 +15,8 @@ export class CreateGradeDto {
 
   @IsInt()
   lessonId: number;
+
+  @IsOptional()
+  @IsString()
+  theme: string;
 }

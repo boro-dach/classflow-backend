@@ -56,8 +56,18 @@ export class AuthService {
           return await this.user.createAdult(dto, token);
         }
       case 'PARENT':
+        if (dto.age < 18) {
+          throw new BadRequestException(
+            'You have to be at least 18 years old to register as a parent',
+          );
+        }
         return await this.user.createParent(dto, token);
       case 'TEACHER':
+        if (dto.age < 18) {
+          throw new BadRequestException(
+            'You have to be at least 18 years old to register as a teacher',
+          );
+        }
         return await this.user.createTeacher(dto, token);
     }
   }
