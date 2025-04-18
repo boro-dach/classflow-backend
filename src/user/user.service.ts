@@ -33,7 +33,6 @@ export class UserService {
         age: dto.age,
         accessToken: token,
         parentId: parent.id,
-        parentCode: parent.parentCode,
         role: dto.role,
         login: dto.login,
       },
